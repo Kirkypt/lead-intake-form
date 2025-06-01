@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lead Intake Form</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; max-width: 800px; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; }
+        button { margin-top: 20px; padding: 10px 20px; font-size: 16px; background-color: #2F5597; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>Lead Intake Form</h2>
+    <form id="leadForm">
+        <label>Who is entering this data?</label>
+        <input type="text" name="call_taker" required>
+
+        <label>Date of Lead</label>
+        <input type="date" name="lead_date" required>
+
+        <label>Pt. Last Name, First Initial</label>
+        <input type="text" name="patient_name" required>
+
+        <label>Pt. Phone</label>
+        <input type="tel" name="patient_phone" placeholder="(555) 123-4567" pattern="\(\d{3}\) \d{3}-\d{4}" required>
+
+        <label>Pt. Email</label>
+        <input type="email" name="patient_email" placeholder="example@email.com">
+
+        <label>Received by</label>
+        <select name="received_by">
+            <option>Fax</option><option>Phone</option><option>Walk-in</option>
+        </select>
+
+        <label>Location Received</label>
+        <select name="location_received">
+            <option>SM</option><option>Wimb.</option>
+        </select>
+
+        <label>Location Scheduled</label>
+        <select name="location_scheduled">
+            <option>SM</option><option>Wimb.</option>
+        </select>
+
+        <label>How the patient heard of you</label>
+        <select name="referral_source">
+            <option>MD</option><option>Social Media</option><option>Web</option><option>Friend or Past Pt</option>
+            <option>Print</option><option>Walk-in/Drive by</option><option>TV</option><option>Radio</option>
+            <option>Mail</option><option>Seminar</option>
+        </select>
+
+        <label>How Recvd</label>
+        <select name="how_received">
+            <option>Fax</option><option>Walk-in</option><option>Tel</option>
+        </select>
+
+        <label>Referring MD / Source (First and Last name)</label>
+        <input type="text" name="ref_md">
+
+        <label>Referring MD Group</label>
+        <input type="text" name="ref_group">
+
+        <label>Case Type</label>
+        <select name="case_type">
+            <option>Ortho</option><option>Balance</option><option>Work Comp</option><option>Auto</option>
+        </select>
+
+        <label>Primary Insurance Type (e.g., MC, BC, UHC, WC)</label>
+        <input type="text" name="insurance_type" placeholder="e.g., MC, BC, UHC, WC">
+
+        <label>Scheduling Success Date</label>
+        <input type="date" name="sched_success">
+
+        <label>Date of the Patient’s Appointment</label>
+        <input type="date" name="appt_date">
+
+        <label>Patient Available Sooner?</label>
+        <select name="avail_sooner">
+            <option>Yes</option><option>No</option>
+        </select>
+
+        <p><strong>📢 Reminder:</strong> After submitting this form, please notify the appropriate staff member that a new entry has been added.</p>
+<button type="button" onclick="saveData()">Submit</button>
+        <button type="button" onclick="downloadCSV()">Download All Submissions</button>
+    </form>
+
+    <script>
+        let entries = [];
+
+        function saveData() {
+            const form = document.forms['leadForm'];
+            let data = {};
+            for (let element of form.elements) {
+                if (element.name) data[element.name] = element.value;
+            }
+            let now = new Date();
+data['timestamp'] = now.toLocaleString(); // Add timestamp
+            entries.push(data);
+            alert("Entry saved!");
+            form.reset();
+        }
+
+        function downloadCSV() {
+            if (entries.length === 0) {
+                alert("No entries to download.");
+                return;
+            }
+            const headers = Object.keys(entries[0]);
+            const csvRows = [headers.join(",")];
+            for (const row of entries) {
+                const values = headers.map(header => `"${(row[header] || '').replace(/"/g, '""')}"`);
+                csvRows.push(values.join(","));
+            }
+
+            const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            const today = new Date().toISOString().split('T')[0];
+            a.href = url;
+            a.download = `LeadLog_${today}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
