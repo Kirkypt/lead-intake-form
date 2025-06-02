@@ -1,39 +1,24 @@
 
 # 📝 Lead Intake Form
 
-This is a fully responsive **Lead Intake Form** designed for clinics or businesses to easily collect and manage patient intake or referral data.
+This is a fully responsive **Lead Intake Form** designed to collect and manage patient intake data.
 
-## 🌐 Live Demo
-Once GitHub Pages is enabled, your form will be live at:
-```
-https://yourusername.github.io/lead-intake-form/
-```
+## 🌐 Features
+- HTML form with dropdowns and validation
+- Local CSV download with timestamp
+- Direct integration with Google Sheets (via Apps Script)
+- View, clear, and manage local entries
 
-## 📄 Form Features
-- ✅ Responsive web form (mobile & desktop)
-- 🎛️ Dropdowns for referral types, case types, and more
-- 🧾 Includes all key intake fields
-- 💾 Client-side CSV export for saving all entries
-- 🔐 No backend required — runs in the browser
+## 💾 Instructions
+1. Open `index.html` in any modern browser
+2. Fill in the lead data
+3. Click **Submit** to save locally and send to Google Sheets
+4. Click **Download All Submissions** to save a CSV copy with timestamps
 
-## 🧠 How to Use
-1. Clone or fork this repo _or_ [upload index.html manually](https://github.com/yourusername/lead-intake-form).
-2. Enable GitHub Pages:
-   - Go to **Settings** → **Pages**
-   - Source: `main` branch
-   - Directory: `/ (root)`
-3. Share the public URL to intake staff
-
-## 🛠️ Customize It
-- Change dropdown options in `index.html` to match your clinic's needs
-- Replace title or header text to brand it for your location
-- Add form logic or integrations (email alerts, storage, etc.)
-
-## 📤 Exporting Data
-Click the **"Download All Submissions"** button to save entries as a CSV file for import into Excel or Sheets.
+## 🔐 Privacy
+- No data is saved in the cloud except what's pushed to your authorized Google Sheet
+- All other data stays in-browser only unless exported manually
 
 ---
 
-### Created by [Fyzical Central Tx]  
-*Built with support from Excel AI – your lead intake assistant 🤖*
-
+*Created by Fyzical Central Tx with help from Excel AI*

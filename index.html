@@ -11,6 +11,10 @@
     </style>
 </head>
 <body>
+    <div style="text-align:center; margin-bottom: 20px;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Fyzical_Logo.svg/1200px-Fyzical_Logo.svg.png" alt="Clinic Logo" style="max-width: 250px; height: auto;">
+    </div>
+
     <h2>Lead Intake Form</h2>
     <form id="leadForm">
         <label>Who is entering this data?</label>
@@ -81,20 +85,16 @@
         </select>
 
         <p><strong>📢 Reminder:</strong> After submitting this form, please notify the appropriate staff member that a new entry has been added.</p>
-<button type="button" onclick="saveData()">Submit</button>
-        
-    <button type="button" onclick="downloadCSV()">Download All Submissions</button>
-    <button type="button" onclick="showSavedEntries()">View Saved Entries</button>
-    <button type="button" onclick="clearSavedEntries()">Clear All Saved Entries</button>
-    <div id="savedEntries" style="margin-top: 20px;"></div>
-    
+        <button type="button" onclick="saveData()">Submit</button>
+        <button type="button" onclick="downloadCSV()">Download All Submissions</button>
+        <button type="button" onclick="showSavedEntries()">View Saved Entries</button>
+        <button type="button" onclick="clearSavedEntries()">Clear All Saved Entries</button>
+        <div id="savedEntries" style="margin-top: 20px;"></div>
     </form>
 
     <script>
-        // Load any saved entries from localStorage on page load
         let entries = JSON.parse(localStorage.getItem("leadEntries") || "[]");
 
-        // Save data persistently and show reminder
         function saveData() {
             const form = document.forms['leadForm'];
             let data = {};
@@ -102,58 +102,36 @@
                 if (element.name) data[element.name] = element.value;
             }
             let now = new Date();
+data["csv_timestamp"] = now.toLocaleString();
             data['timestamp'] = now.toLocaleString();
             entries.push(data);
             localStorage.setItem("leadEntries", JSON.stringify(entries));
+            sendToGoogleSheet(data);
             alert("✅ Entry saved! Be sure to click 'Download All Submissions' before closing this tab.");
             form.reset();
         }
 
-        // Export CSV and clear LocalStorage
-        
-    function showSavedEntries() {
-        const div = document.getElementById("savedEntries");
-        if (entries.length === 0) {
-            div.innerHTML = "<p><em>No saved entries to display.</em></p>";
-            return;
-        }
-        const table = document.createElement("table");
-        table.style.borderCollapse = "collapse";
-        table.style.width = "100%";
-        const headers = Object.keys(entries[0]);
-        let html = "<thead><tr>";
-        headers.forEach(header => {
-            html += `<th style='border:1px solid #ccc;padding:5px;background:#f0f0f0;'>${header}</th>`;
-        });
-        html += "</tr></thead><tbody>";
-        entries.forEach(row => {
-            html += "<tr>";
-            headers.forEach(header => {
-                html += `<td style='border:1px solid #ccc;padding:5px;'>${row[header] || ""}</td>`;
+        function sendToGoogleSheet(data) {
+            fetch("https://script.google.com/macros/s/AKfycbznDCbbA7sk1S8qxFBPCFj3jhr9p_mdcDiuqBgkF2os8sc8Yra8nR-WbyIpeujk-oJ29w/exec", {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).then(res => {
+                console.log("✅ Sent to Google Sheet");
+            }).catch(err => {
+                console.error("❌ Error sending to Google Sheet", err);
             });
-            html += "</tr>";
-        });
-        html += "</tbody>";
-        table.innerHTML = html;
-        div.innerHTML = "<h4>📋 Saved Entries (This session)</h4>";
-        div.appendChild(table);
-    }
-
-    function clearSavedEntries() {
-        if (confirm("⚠️ Are you sure you want to clear all saved entries? This cannot be undone.")) {
-            entries = [];
-            localStorage.removeItem("leadEntries");
-            document.getElementById("savedEntries").innerHTML = "<p><em>All saved entries have been cleared.</em></p>";
         }
-    }
 
-    function downloadCSV() {
-    
+        function downloadCSV() {
             if (entries.length === 0) {
                 alert("No entries to download.");
                 return;
             }
             const headers = Object.keys(entries[0]);
+headers.push("csv_timestamp");
             const csvRows = [headers.join(",")];
             for (const row of entries) {
                 const values = headers.map(header => `"${(row[header] || '').replace(/"/g, '""')}"`);
@@ -170,85 +148,45 @@
             a.click();
             document.body.removeChild(a);
 
-            // Optional: Clear entries from memory and localStorage after download
             entries = [];
             localStorage.removeItem("leadEntries");
         }
-    </script>
-        let entries = [];
 
-        function saveData() {
-            const form = document.forms['leadForm'];
-            let data = {};
-            for (let element of form.elements) {
-                if (element.name) data[element.name] = element.value;
-            }
-            let now = new Date();
-data['timestamp'] = now.toLocaleString(); // Add timestamp
-            entries.push(data);
-            alert("Entry saved!");
-            form.reset();
-        }
-
-        
-    function showSavedEntries() {
-        const div = document.getElementById("savedEntries");
-        if (entries.length === 0) {
-            div.innerHTML = "<p><em>No saved entries to display.</em></p>";
-            return;
-        }
-        const table = document.createElement("table");
-        table.style.borderCollapse = "collapse";
-        table.style.width = "100%";
-        const headers = Object.keys(entries[0]);
-        let html = "<thead><tr>";
-        headers.forEach(header => {
-            html += `<th style='border:1px solid #ccc;padding:5px;background:#f0f0f0;'>${header}</th>`;
-        });
-        html += "</tr></thead><tbody>";
-        entries.forEach(row => {
-            html += "<tr>";
-            headers.forEach(header => {
-                html += `<td style='border:1px solid #ccc;padding:5px;'>${row[header] || ""}</td>`;
-            });
-            html += "</tr>";
-        });
-        html += "</tbody>";
-        table.innerHTML = html;
-        div.innerHTML = "<h4>📋 Saved Entries (This session)</h4>";
-        div.appendChild(table);
-    }
-
-    function clearSavedEntries() {
-        if (confirm("⚠️ Are you sure you want to clear all saved entries? This cannot be undone.")) {
-            entries = [];
-            localStorage.removeItem("leadEntries");
-            document.getElementById("savedEntries").innerHTML = "<p><em>All saved entries have been cleared.</em></p>";
-        }
-    }
-
-    function downloadCSV() {
-    
+        function showSavedEntries() {
+            const div = document.getElementById("savedEntries");
             if (entries.length === 0) {
-                alert("No entries to download.");
+                div.innerHTML = "<p><em>No saved entries to display.</em></p>";
                 return;
             }
+            const table = document.createElement("table");
+            table.style.borderCollapse = "collapse";
+            table.style.width = "100%";
             const headers = Object.keys(entries[0]);
-            const csvRows = [headers.join(",")];
-            for (const row of entries) {
-                const values = headers.map(header => `"${(row[header] || '').replace(/"/g, '""')}"`);
-                csvRows.push(values.join(","));
-            }
+headers.push("csv_timestamp");
+            let html = "<thead><tr>";
+            headers.forEach(header => {
+                html += `<th style='border:1px solid #ccc;padding:5px;background:#f0f0f0;'>${header}</th>`;
+            });
+            html += "</tr></thead><tbody>";
+            entries.forEach(row => {
+                html += "<tr>";
+                headers.forEach(header => {
+                    html += `<td style='border:1px solid #ccc;padding:5px;'>${row[header] || ""}</td>`;
+                });
+                html += "</tr>";
+            });
+            html += "</tbody>";
+            table.innerHTML = html;
+            div.innerHTML = "<h4>📋 Saved Entries (This session)</h4>";
+            div.appendChild(table);
+        }
 
-            const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            const today = new Date().toISOString().split('T')[0];
-            a.href = url;
-            a.download = `LeadLog_${today}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+        function clearSavedEntries() {
+            if (confirm("⚠️ Are you sure you want to clear all saved entries? This cannot be undone.")) {
+                entries = [];
+                localStorage.removeItem("leadEntries");
+                document.getElementById("savedEntries").innerHTML = "<p><em>All saved entries have been cleared.</em></p>";
+            }
         }
     </script>
 </body>
